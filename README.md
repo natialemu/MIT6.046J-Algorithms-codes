@@ -9,7 +9,7 @@ codes for Design and Analysis of Algorithms course on MIT opencourseware. This r
 
 ## Algorithms
 
-- Convex Hull
+- Two Finger Algorithm (Convex Hull problem)
 - Fast Fourier Transform
 - Advanced DP Algorithms
 - Max Flow 
