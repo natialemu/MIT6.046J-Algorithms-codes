@@ -1,4 +1,5 @@
 import math
+import cmath
 def factorial(n):
     fact = 1
     for i in range(n):
@@ -84,6 +85,10 @@ class Polynomial:
         if len(poly1)==0:
             poly1.append(0)
         return Polynomial(poly1)
+
+    def getCoefficients(self):
+        return self.poly
+
         
     def integral(self):
         poly1 = self.poly[:]
@@ -150,7 +155,105 @@ class Polynomial:
             for i in range(len(bpoly.poly)):
                 poly1.append(self.poly[i] - bpoly.poly[i])
         return Polynomial(poly1)
+
+    def fastFourierTransform(self,x_choice):
+        return fftHelper(self.poly,x_choice)
+
+    def _fftHelper(coefficients,x_choice):
+        if(len(coefficients) == 1):
+            result = Polynomial(coefficients).evaluate(x_choice)
+            mapping = dict()
+            mapping[x_choice] = result
+            return mapping
+        else:
+            evenCoeffs = collectCoefficients(coefficients,0)
+            oddCoeffs = collectCoefficients(coefficients,1)
+
+            evenMapping = _fftHelper(evenCoeffs,x_choice)
+            oddMapping = _fftHelper(oddCoeffs,x_choice)
+
+            mergedMapping = fftMerge(evenMapping,oddMapping, evenCoeffs,oddCoeffs)
+            return mergedMapping
+
+    def fftMerge(evenMapping,oddMapping,evenCoeffs,oddCoeffs):
+        mergedMapping = {}
+        for x in evenMapping.keys():
+            x1 = cmath.sqrt(x);
+            x2 = 0 - x1
+            f_x1 = 0;
+            f_x2 = 0;
+            if(x not in evenMapping.keys()):
+                f_x1 = Polynomial(evenCoeffs).evaluate(x) + x1*oddMapping[x]
+                f_x2 = Polynomial(evenCoeffs).evaluate(x) + x2*oddMapping[x]
+            elif(x not in oddMapping.keys()):
+                f_x1 = evenMapping[x] + x1*Polynomial(oddCoeffs).evaluate(x)
+                f_x2 = evenMapping[x] + x2*Polynomial(oddCoeffs).evaluate(x)
+            else:
+                f_x1 = evenMapping[x] + x1*oddMapping[x]
+                f_x2 = evenMapping[x] + x2*oddMapping[x]
+
+            if(x1 not in mergedMapping.keys()):
+                mergedMapping[x1] = f_x1
+            if(x2 not in mergedMapping.keys()):
+                mergedMapping[x2] = f_x2
+
+        for x in oddMapping.keys():
+            x1 = cmath.sqrt(x);
+            x2 = 0 - x1
+            if(x1  in mergedMapping.keys() || x2 in mergedMapping.keys()):
+                continue
+                
+            f_x1 = 0;
+            f_x2 = 0;
+            if(x not in evenMapping.keys()):
+                f_x1 = Polynomial(evenCoeffs).evaluate(x) + x1*oddMapping[x]
+                f_x2 = Polynomial(evenCoeffs).evaluate(x) + x2*oddMapping[x]
+            elif(x not in oddMapping.keys()):
+                f_x1 = evenMapping[x] + x1*Polynomial(oddCoeffs).evaluate(x)
+                f_x2 = evenMapping[x] + x2*Polynomial(oddCoeffs).evaluate(x)
+            else:
+                f_x1 = evenMapping[x] + x1*oddMapping[x]
+                f_x2 = evenMapping[x] + x2*oddMapping[x]
+
+            mergedMapping[x1] = f_x1
+            mergedMapping[x2] = f_x2
+
+        return mergedMapping
+    def reverseFFT(self,sampleForm):
+        ''' to be implemented '''
+            
+
+
+
+
+
+
+
+
+
+    def collectCoefficients(coefficients,starting_index):
+
+        newCoefficients = []
+        for i in range(starting_index,len(coefficients),2):
+            newCoefficients.append(coefficients[i])
+        return newCoefficients
+
+
+
+
     def __mul__(self, bpoly):
+        sample_form_bpoly = bpoly.fastFourierTransform(1)
+        sample_form_self = self.poly.fastFourierTransform(1)
+
+        product_in_sample_form = {}
+        for x in sample_form_self.keys():
+            product_in_sample_form[x] = sample_form_self[x]*sample_form_bpoly[x]
+
+        product_in_coefficient_form = reverseFFT(product_in_sample_form)
+        return Polynomial(product_in_coefficient_form)
+
+
+
 
     #implement the remaining methods
         
