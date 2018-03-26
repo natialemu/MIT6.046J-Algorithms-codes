@@ -317,6 +317,25 @@ def main():
         print("    p-p = ", p-p)
         print()    
 
+    print("Fast-fourier transform")
+    for k in range(len(myPolys)):
+        if k < 8:
+            print("p"+str(k)+":")
+        else:
+            print("pe:")
+        p = myPolys[k]
+        p_sample_form = p.fastFourierTransform(1)
+
+
+        print("    p = ", p)
+        
+        print("    sampleForm = ", p_sample_form)
+        print("    reverse FFT being applied---")
+        original_p = p.reverseFFT(p_sample_form)
+        print("    original polynomial form = ", original_p)
+        print()
+
+
     print("Multiplication")
     for k in range(len(myPolys)):
         if k < 8:
