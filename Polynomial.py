@@ -221,7 +221,16 @@ class Polynomial:
         return mergedMapping
     def reverseFFT(self,sampleForm):
         ''' to be implemented '''
-            
+        y_value = []
+        for x in sampleForm.keys():
+            y_value.append(complex(sampleForm[x].imag,sampleForm[x].real))
+
+        coefficientMapping = fastFourierTransform(y_value)
+
+        coefficients = []
+        for x in coefficientMapping.keys():
+            coefficients.append(complex(coefficientMapping[x].imag,coefficientMapping[x].real))
+        return coefficients
 
 
 
