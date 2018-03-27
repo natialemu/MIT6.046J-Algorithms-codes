@@ -1,6 +1,21 @@
 public class PointNode {
     private PointNode next;
     private PointNode prev;
+    private Point p;
+
+    public PointNode(Point p){
+        this.p = p;
+        next = null;
+        prev = null;
+    }
+
+    public Point getP() {
+        return p;
+    }
+
+    public void setP(Point p) {
+        this.p = p;
+    }
 
     public PointNode(PointNode next, PointNode prev){
         this.next = next;
