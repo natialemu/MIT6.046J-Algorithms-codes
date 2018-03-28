@@ -1,4 +1,16 @@
-public class Point {
+public class Point implements Comparable{
+    @Override
+    public int compareTo(Object o) {
+        Point other = (Point)o;
+        if(this.x > other.x){
+            return 1;
+        }else if(this.x <other.x){
+            return -1;
+        }else{
+            return 0;
+        }
+    }
+
     private double x;
     private double y;
 

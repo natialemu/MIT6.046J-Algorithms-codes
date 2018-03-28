@@ -16,7 +16,7 @@ public class ConvexHull {
             initialPoint = initialPoint.getNext();
             if(initialPoint.getP().equals(new Point(Double.POSITIVE_INFINITY,Double.POSITIVE_INFINITY))){
                 //reached a cycle
-                return false;
+                return insertAfter(initialPoint.getP(),toBeInserted);//insert after the sentinel by default
             }
         }
         PointNode nodeOfInterest = new PointNode(toBeInserted);
