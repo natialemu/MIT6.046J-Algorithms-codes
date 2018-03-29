@@ -1,3 +1,5 @@
+import sun.management.jmxremote.ConnectorBootstrap;
+
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -5,9 +7,32 @@ import java.util.List;
 public class ConvexHullDriver {
 
     public static void main(String[] main){
-        /**
-         * Tests go here
-         */
+       
+        List<Point> testPoints1 = new ArrayList<>();
+        List<Point> testPoints2 = new ArrayList<>();
+        List<Point> testPoints3 = new ArrayList<>();
+        for(int i =0; i < 10;i++){
+            double x = (Math.random()*20);
+            double y = (Math.random()*20);
+            testPoints1.add(new Point(x,y));
+        }
+
+        testPoints2.add(new Point(2,2));
+        testPoints2.add(new Point(1,1));
+
+
+        testPoints3.add(new Point(0,1));
+        testPoints3.add(new Point(2,3));
+        testPoints3.add(new Point(1,0));
+
+
+
+        ConvexHull convexHull1 = findConvexHull(testPoints1);
+        ConvexHull convexHull2 = findConvexHull(testPoints2);
+        ConvexHull convexHull3 = findConvexHull(testPoints3);
+
+
+
 
     }
 
