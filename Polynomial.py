@@ -16,19 +16,44 @@ class Polynomial:
     def __init__(self, coefList):
         self.poly = coefList
     def __str__(self):
-        to_return =  "%.2f"%(self.poly[0])
+        to_return = ""
+        if(self.poly[0].imag != 0):
+            to_return = "%.2f + %.2fi" % (self.poly[0].real, self.poly[0].imag)
+        else:
+            to_return = " + %.2f"%(self.poly[0].real)
+
+
         for i in range(1,len(self.poly)):
             if self.poly[i] == 0:
                 continue
             current = self.poly[i]
-            to_return += " + %.2fx^%d"%(current,i)
+            if (current.imag != 0):
+                to_return += "+ (%.2f + %.2fi)x^%d" % (current.real, current.imag,i)
+            else:
+                to_return += " + %.2fx^%d" % (current, i)
+
+
         return to_return
 
     # evaluates the polynomial at x
     def evaluate(self, x):
-        result = 0
+        result = complex(0, 0)
+
         for i in range(len(self.poly)):
-            result += self.poly[i]*math.pow(x,i)
+            print(complex(x.real,x.imag))
+            var_part = self.cpow(complex(x.real, x.imag), i)
+            currentResult = self.poly[i] * var_part
+            print(self.poly[i])
+            print(var_part)
+            print(currentResult)
+            result = complex(result.real+currentResult.real,result.imag+currentResult.imag)
+
+        return result
+
+    def cpow(self,x,y):
+        result = complex(1, 1)
+        for i in range(1,y):
+            result = x*result
         return result
     def degree(self):
         coeficients = self.poly[:]
@@ -157,25 +182,25 @@ class Polynomial:
         return Polynomial(poly1)
 
     def fastFourierTransform(self,x_choice):
-        return fftHelper(self.poly,x_choice)
+        return self._fftHelper(self.poly, x_choice)
 
-    def _fftHelper(coefficients,x_choice):
+    def _fftHelper(self,coefficients,x_choice):
         if(len(coefficients) == 1):
             result = Polynomial(coefficients).evaluate(x_choice)
             mapping = dict()
             mapping[x_choice] = result
             return mapping
         else:
-            evenCoeffs = collectCoefficients(coefficients,0)
-            oddCoeffs = collectCoefficients(coefficients,1)
+            evenCoeffs = self.collectCoefficients(coefficients,0)
+            oddCoeffs = self.collectCoefficients(coefficients,1)
 
-            evenMapping = _fftHelper(evenCoeffs,x_choice)
-            oddMapping = _fftHelper(oddCoeffs,x_choice)
+            evenMapping = self._fftHelper(evenCoeffs,x_choice)
+            oddMapping = self._fftHelper(oddCoeffs,x_choice)
 
-            mergedMapping = fftMerge(evenMapping,oddMapping, evenCoeffs,oddCoeffs)
+            mergedMapping = self.fftMerge(evenMapping,oddMapping, evenCoeffs,oddCoeffs)
             return mergedMapping
 
-    def fftMerge(evenMapping,oddMapping,evenCoeffs,oddCoeffs):
+    def fftMerge(self,evenMapping,oddMapping,evenCoeffs,oddCoeffs):
         mergedMapping = {}
         for x in evenMapping.keys():
             x1 = cmath.sqrt(x);
@@ -200,7 +225,7 @@ class Polynomial:
         for x in oddMapping.keys():
             x1 = cmath.sqrt(x);
             x2 = 0 - x1
-            if(x1  in mergedMapping.keys() || x2 in mergedMapping.keys()):
+            if(x1  in mergedMapping.keys() or x2 in mergedMapping.keys()):
                 continue
                 
             f_x1 = 0;
@@ -220,12 +245,12 @@ class Polynomial:
 
         return mergedMapping
     def reverseFFT(self,sampleForm):
-        ''' to be implemented '''
+
         y_value = []
         for x in sampleForm.keys():
             y_value.append(complex(sampleForm[x].imag,sampleForm[x].real))
 
-        coefficientMapping = fastFourierTransform(y_value)
+        coefficientMapping = Polynomial(y_value).fastFourierTransform(1)
 
         coefficients = []
         for x in coefficientMapping.keys():
@@ -240,7 +265,7 @@ class Polynomial:
 
 
 
-    def collectCoefficients(coefficients,starting_index):
+    def collectCoefficients(self,coefficients,starting_index):
 
         newCoefficients = []
         for i in range(starting_index,len(coefficients),2):
@@ -252,13 +277,13 @@ class Polynomial:
 
     def __mul__(self, bpoly):
         sample_form_bpoly = bpoly.fastFourierTransform(1)
-        sample_form_self = self.poly.fastFourierTransform(1)
+        sample_form_self = self.fastFourierTransform(1)
 
         product_in_sample_form = {}
         for x in sample_form_self.keys():
             product_in_sample_form[x] = sample_form_self[x]*sample_form_bpoly[x]
 
-        product_in_coefficient_form = reverseFFT(product_in_sample_form)
+        product_in_coefficient_form = self.reverseFFT(product_in_sample_form)
         return Polynomial(product_in_coefficient_form)
 
 
